@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/stuart-warren/yamlfmt"
+	"github.com/lollipopman/yamlfmt"
 )
 
 func TestYamlSort(t *testing.T) {

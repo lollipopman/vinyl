@@ -19,7 +19,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/stuart-warren/yamlfmt"
+	"github.com/lollipopman/yamlfmt"
 )
 
 var (
