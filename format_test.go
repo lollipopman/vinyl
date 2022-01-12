@@ -17,8 +17,7 @@ k:
     # comment
     c: i
 `
-	var expected = `---
-k:
+	var expected = `k:
   c: l
   i:
     i: k
@@ -44,8 +43,7 @@ bar:
   foo: baz # comment
   boo: fizz
 `
-	var expected = `---
-bar:
+	var expected = `bar:
   boo: fizz
   foo: baz # comment
 `
@@ -79,8 +77,7 @@ k:
     # comment
     c: i
 `
-	var expected = `---
-k:
+	var expected = `k:
   c: l
   i:
     i: k

@@ -17,6 +17,7 @@ const indent = 2
 func Format(r io.Reader, sort bool) ([]byte, error) {
 	dec := yaml.NewDecoder(r)
 	out := bytes.NewBuffer(nil)
+	numDocs := 0
 	for {
 		enc := yaml.NewEncoder(out)
 		enc.SetIndent(indent)
@@ -29,7 +30,11 @@ func Format(r io.Reader, sort bool) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed decoding: %s", err)
 		}
-		out.WriteString("---\n")
+		// Only output the yaml doc separator if there is more than one document,
+		// mirrors gopkg.in/yaml.v3
+		if numDocs > 0 {
+			out.WriteString("---\n")
+		}
 		if sort {
 			err = enc.Encode(sortYAML(&doc))
 		} else {
@@ -39,6 +44,7 @@ func Format(r io.Reader, sort bool) ([]byte, error) {
 			return nil, fmt.Errorf("failed encoding: %s", err)
 		}
 		enc.Close()
+		numDocs++
 	}
 	return out.Bytes(), nil
 }
