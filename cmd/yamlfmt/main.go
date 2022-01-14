@@ -27,7 +27,6 @@ var (
 	write  bool
 	doDiff bool
 	doFail bool
-	doSort bool
 
 	errRequiresFmt = errors.New("RequiresFmt")
 )
@@ -49,7 +48,6 @@ func run(in io.Reader, out io.Writer, args []string) error {
 	flags.BoolVar(&write, "w", false, "write result to (source) file instead of stdout")
 	flags.BoolVar(&doDiff, "d", false, "display diffs instead of rewriting files")
 	flags.BoolVar(&doFail, "f", false, "exit non zero if changes detected")
-	flags.BoolVar(&doSort, "s", false, "sort maps & sequences, WARNING: This may break anchors & aliases")
 	flags.Usage = func() {
 		fmt.Fprintf(os.Stderr, "formats yaml files with 2 space indent and non-indented sequences\n")
 		fmt.Fprintf(os.Stderr, "usage: yamlfmt [flags] [path ...]\n")
@@ -61,7 +59,7 @@ func run(in io.Reader, out io.Writer, args []string) error {
 		if write {
 			return fmt.Errorf("error: cannot use -w with standard input")
 		}
-		if err := processFile("<standard input>", in, out, true, doSort); err != nil {
+		if err := processFile("<standard input>", in, out, true); err != nil {
 			return err
 		}
 	}
@@ -72,9 +70,9 @@ func run(in io.Reader, out io.Writer, args []string) error {
 		case err != nil:
 			return err
 		case dir.IsDir():
-			return walkDir(path, doSort)
+			return walkDir(path)
 		default:
-			if err := processFile(path, nil, os.Stdout, false, doSort); err != nil {
+			if err := processFile(path, nil, os.Stdout, false); err != nil {
 				return err
 			}
 		}
@@ -83,7 +81,7 @@ func run(in io.Reader, out io.Writer, args []string) error {
 }
 
 // If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, in io.Reader, out io.Writer, stdin bool, sort bool) error {
+func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error {
 	var perm os.FileMode = 0644
 	if in == nil {
 		f, err := os.Open(filename)
@@ -104,7 +102,7 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool, sort 
 		return err
 	}
 
-	res, err := yamlfmt.Format(bytes.NewBuffer(src), sort)
+	res, err := yamlfmt.Format(bytes.NewBuffer(src))
 	if err != nil {
 		return err
 	}
@@ -152,12 +150,11 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool, sort 
 
 type fileVisitor struct {
 	changesDetected bool
-	sort            bool
 }
 
 func (fv *fileVisitor) visitFile(path string, f os.FileInfo, err error) error {
 	if err == nil && isYamlFile(f) {
-		err = processFile(path, nil, os.Stdout, false, fv.sort)
+		err = processFile(path, nil, os.Stdout, false)
 	}
 	// Don't complain if a file was deleted in the meantime (i.e.
 	// the directory changed concurrently while running gofmt).
@@ -170,8 +167,8 @@ func (fv *fileVisitor) visitFile(path string, f os.FileInfo, err error) error {
 	return nil
 }
 
-func walkDir(path string, sort bool) error {
-	fv := fileVisitor{sort: sort}
+func walkDir(path string) error {
+	fv := fileVisitor{}
 	filepath.Walk(path, fv.visitFile)
 	var err error
 	if fv.changesDetected {

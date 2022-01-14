@@ -11,10 +11,9 @@ import (
 const indent = 2
 
 // Format reads in a yaml document and outputs the yaml in a standard format.
-// If sort is true than dictionary keys are sorted lexicographically
 // Indents are set to 2
 // Lists are not indented
-func Format(r io.Reader, sort bool) ([]byte, error) {
+func Format(r io.Reader) ([]byte, error) {
 	dec := yaml.NewDecoder(r)
 	out := bytes.NewBuffer(nil)
 	numDocs := 0
@@ -35,11 +34,7 @@ func Format(r io.Reader, sort bool) ([]byte, error) {
 		if numDocs > 0 {
 			out.WriteString("---\n")
 		}
-		if sort {
-			err = enc.Encode(sortYAML(&doc))
-		} else {
-			err = enc.Encode(&doc)
-		}
+		err = enc.Encode(&doc)
 		if err != nil {
 			return nil, fmt.Errorf("failed encoding: %s", err)
 		}
