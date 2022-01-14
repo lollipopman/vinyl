@@ -13,7 +13,7 @@ const indent = 2
 // Format reads in a yaml document and outputs the yaml in a standard format.
 // Indents are set to 2
 // Lists are not indented
-func Format(r io.Reader) ([]byte, error) {
+func Format(filename string, r io.Reader) ([]byte, error) {
 	dec := yaml.NewDecoder(r)
 	out := bytes.NewBuffer(nil)
 	numDocs := 0
