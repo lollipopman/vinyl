@@ -1,9 +1,19 @@
 # yamlfmt
 
-Based on gofmt, yamlfmt formats yaml files into a canonical format
+Based on gofmt, yamlfmt formats yaml files into a canonical format, with
+indentation set to 2 spaces, including for sequences, e.g.:
 
--   sequences are not indented
--   indent is 2 spaces
+``` yaml
+recipies:
+  - pizza: {}
+  - lasagna: {}
+  - barley soup:
+      ingredients:
+        - barley
+        - onions
+        - beef
+      serves: 4
+```
 
 ## Usage
 
