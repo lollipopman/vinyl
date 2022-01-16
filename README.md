@@ -1,4 +1,4 @@
-# VINYL: VINYL Inscribes Nettlesome YAML Legibly.
+# VINYL Inscribes Nettlesome YAML Legibly
 
 VINYL formats yaml files into a canonical format retaining comments and
 setting the indentation by default to two spaces, including for
