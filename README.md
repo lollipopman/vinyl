@@ -31,6 +31,8 @@ parsing the yaml and formatting the output
       -cpuprofile string
             write cpu profile to this file
       -d    display diffs instead of rewriting files
+      -i uint
+            number of spaces to indent (default 2)
       -l    list files whose formatting differs from vinyl's
       -w    write result to (source) file instead of stdout
 

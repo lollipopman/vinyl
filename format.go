@@ -8,18 +8,22 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type FormatOpts struct {
+	IndentNum uint
+}
+
 const indent = 2
 
 // Format reads in a yaml document and outputs the yaml in a standard format.
 // Indents are set to 2
 // Lists are not indented
-func Format(filename string, r io.Reader) ([]byte, error) {
+func Format(filename string, r io.Reader, opts FormatOpts) ([]byte, error) {
 	dec := yaml.NewDecoder(r)
 	out := bytes.NewBuffer(nil)
 	numDocs := 0
 	for {
 		enc := yaml.NewEncoder(out)
-		enc.SetIndent(indent)
+		enc.SetIndent(int(opts.IndentNum))
 		defer enc.Close()
 		var doc yaml.Node
 		err := dec.Decode(&doc)

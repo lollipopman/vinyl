@@ -28,9 +28,10 @@ import (
 
 var (
 	// main operation modes
-	list   = flag.Bool("l", false, "list files whose formatting differs from vinyl's")
-	write  = flag.Bool("w", false, "write result to (source) file instead of stdout")
-	doDiff = flag.Bool("d", false, "display diffs instead of rewriting files")
+	list      = flag.Bool("l", false, "list files whose formatting differs from vinyl's")
+	write     = flag.Bool("w", false, "write result to (source) file instead of stdout")
+	doDiff    = flag.Bool("d", false, "display diffs instead of rewriting files")
+	indentNum = flag.Uint("i", 2, "number of spaces to indent")
 
 	// debugging
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to this file")
@@ -184,7 +185,7 @@ func (r *reporter) ExitCode() int {
 
 // If info == nil, we are formatting stdin instead of a file.
 // If in == nil, the source is the contents of the file with the given filename.
-func processFile(filename string, info fs.FileInfo, in io.Reader, r *reporter) error {
+func processFile(filename string, info fs.FileInfo, in io.Reader, opts vinyl.FormatOpts, r *reporter) error {
 	if in == nil {
 		var err error
 		in, err = os.Open(filename)
@@ -236,7 +237,7 @@ func processFile(filename string, info fs.FileInfo, in io.Reader, r *reporter) e
 		}
 	}
 
-	res, err := vinyl.Format(filename, bytes.NewBuffer(src))
+	res, err := vinyl.Format(filename, bytes.NewBuffer(src), opts)
 	if err != nil {
 		return err
 	}
@@ -302,6 +303,10 @@ func main() {
 func vinylMain(s *sequencer) {
 	flag.Usage = usage
 	flag.Parse()
+	opts := vinyl.FormatOpts{IndentNum: 2}
+	if *indentNum > 0 {
+		opts.IndentNum = *indentNum
+	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -315,13 +320,14 @@ func vinylMain(s *sequencer) {
 	}
 
 	args := flag.Args()
+
 	if len(args) == 0 {
 		if *write {
 			s.AddReport(fmt.Errorf("error: cannot use -w with standard input"))
 			return
 		}
 		s.Add(0, func(r *reporter) error {
-			return processFile("<standard input>", nil, os.Stdin, r)
+			return processFile("<standard input>", nil, os.Stdin, opts, r)
 		})
 		return
 	}
@@ -334,7 +340,7 @@ func vinylMain(s *sequencer) {
 			// Non-directory arguments are always formatted.
 			arg := arg
 			s.Add(fileWeight(arg, info), func(r *reporter) error {
-				return processFile(arg, info, nil, r)
+				return processFile(arg, info, nil, opts, r)
 			})
 		default:
 			// Directories are walked, ignoring non-Yaml files.
@@ -348,7 +354,7 @@ func vinylMain(s *sequencer) {
 					return nil
 				}
 				s.Add(fileWeight(path, info), func(r *reporter) error {
-					return processFile(path, info, nil, r)
+					return processFile(path, info, nil, opts, r)
 				})
 				return nil
 			})
