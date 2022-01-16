@@ -19,8 +19,10 @@ recipies:
       serves: 4
 ```
 
-It uses code from `gofmt` and [go-yaml](https://gopkg.in/yaml.v3) does
-the heavy lifting of parsing the yaml and formatting the output
+It uses code from
+[gofmt](https://github.com/golang/go/blob/master/src/cmd/gofmt/gofmt.go)
+and [go-yaml](https://gopkg.in/yaml.v3) does the heavy lifting of
+parsing the yaml and formatting the output
 
 ## Usage
 
