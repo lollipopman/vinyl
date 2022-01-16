@@ -34,6 +34,7 @@ parsing the yaml and formatting the output
       -i uint
             number of spaces to indent (default 2)
       -l    list files whose formatting differs from vinyl's
+      -m    don't error on duplicate keys in mappings
       -w    write result to (source) file instead of stdout
 
 Without an explicit path, it processes from standard input. Given a

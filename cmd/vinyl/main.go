@@ -28,10 +28,11 @@ import (
 
 var (
 	// main operation modes
-	list      = flag.Bool("l", false, "list files whose formatting differs from vinyl's")
-	write     = flag.Bool("w", false, "write result to (source) file instead of stdout")
-	doDiff    = flag.Bool("d", false, "display diffs instead of rewriting files")
-	indentNum = flag.Uint("i", 2, "number of spaces to indent")
+	list             = flag.Bool("l", false, "list files whose formatting differs from vinyl's")
+	write            = flag.Bool("w", false, "write result to (source) file instead of stdout")
+	doDiff           = flag.Bool("d", false, "display diffs instead of rewriting files")
+	ignoreMapKeyDups = flag.Bool("m", false, "don't error on duplicate keys in mappings")
+	indentNum        = flag.Uint("i", 2, "number of spaces to indent")
 
 	// debugging
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to this file")
@@ -303,7 +304,7 @@ func main() {
 func vinylMain(s *sequencer) {
 	flag.Usage = usage
 	flag.Parse()
-	opts := vinyl.FormatOpts{IndentNum: 2}
+	opts := vinyl.FormatOpts{IndentNum: 2, IgnoreMapKeyDups: *ignoreMapKeyDups}
 	if *indentNum > 0 {
 		opts.IndentNum = *indentNum
 	}

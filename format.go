@@ -9,7 +9,8 @@ import (
 )
 
 type FormatOpts struct {
-	IndentNum uint
+	IndentNum        uint
+	IgnoreMapKeyDups bool
 }
 
 const indent = 2
@@ -45,15 +46,17 @@ func Format(filename string, r io.Reader, opts FormatOpts) ([]byte, error) {
 		enc.Close()
 		numDocs++
 	}
-	// HACK: At present gopkg.in/yaml.v3 does not perform duplicate key checking
-	// when decoding into a yaml.Node[1]. So we decode into an interface{} and
-	// throw away the result, as we are only interested in the errors, if any.
-	//
-	// [1]: https://github.com/go-yaml/yaml/issues/814
-	var unused interface{}
-	err := yaml.Unmarshal(out.Bytes(), &unused)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", filename, err)
+	if !opts.IgnoreMapKeyDups {
+		// HACK: At present gopkg.in/yaml.v3 does not perform duplicate key checking
+		// when decoding into a yaml.Node[1]. So we decode into an interface{} and
+		// throw away the result, as we are only interested in the errors, if any.
+		//
+		// [1]: https://github.com/go-yaml/yaml/issues/814
+		var unused interface{}
+		err := yaml.Unmarshal(out.Bytes(), &unused)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", filename, err)
+		}
 	}
 	return out.Bytes(), nil
 }
