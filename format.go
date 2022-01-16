@@ -1,4 +1,4 @@
-package yamlfmt
+package vinyl
 
 import (
 	"bytes"

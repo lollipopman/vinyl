@@ -1,10 +1,10 @@
 FROM golang:1.13
-WORKDIR /go/src/github.com/stuart-warren/yamlfmt/
+WORKDIR /go/src/github.com/lollipopman/vinyl/
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -a -o yamlfmt ./cmd/yamlfmt
+RUN CGO_ENABLED=0 GOOS=linux go build -a -o vinyl ./cmd/vinyl
 
 FROM alpine:3.11  
 RUN apk --no-cache add diffutils
 WORKDIR /tmp
-COPY --from=0 /go/src/github.com/stuart-warren/yamlfmt/yamlfmt /usr/local/bin/yamlfmt
-ENTRYPOINT ["/usr/local/bin/yamlfmt"] 
+COPY --from=0 /go/src/github.com/lollipopman/vinyl/vinyl /usr/local/bin/vinyl
+ENTRYPOINT ["/usr/local/bin/vinyl"] 

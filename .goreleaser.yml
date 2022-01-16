@@ -6,7 +6,7 @@ before:
 builds:
 - env:
   - CGO_ENABLED=0
-  main: ./cmd/yamlfmt/main.go
+  main: ./cmd/vinyl/main.go
   goos:
   - windows
   - darwin
@@ -36,18 +36,18 @@ changelog:
     - Merge branch
     - go mod tidy
 brews:
-- name: yamlfmt
+- name: vinyl
   tap:
-    owner: stuart-warren
+    owner: lollipopman
     name: homebrew-apps
     token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
   folder: Formula
-  homepage:  https://github.com/stuart-warren/yamlfmt
-  description: based on gofmt, yamlfmt formats yaml files into a canonical format
+  homepage:  https://github.com/lollipopman/vinyl
+  description: based on gofmt, vinyl formats yaml files into a canonical format
   license: BSD-3-clause
   test: |
-    system "#{bin}/yamlfmt -help"
+    system "#{bin}/vinyl -help"
   dependencies:
   - name: go
   install: |-
-    bin.install "yamlfmt"
+    bin.install "vinyl"

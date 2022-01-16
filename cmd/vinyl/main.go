@@ -21,14 +21,14 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"github.com/lollipopman/yamlfmt"
+	"github.com/lollipopman/vinyl"
 
 	"golang.org/x/sync/semaphore"
 )
 
 var (
 	// main operation modes
-	list   = flag.Bool("l", false, "list files whose formatting differs from yamlfmt's")
+	list   = flag.Bool("l", false, "list files whose formatting differs from vinyl's")
 	write  = flag.Bool("w", false, "write result to (source) file instead of stdout")
 	doDiff = flag.Bool("d", false, "display diffs instead of rewriting files")
 
@@ -37,7 +37,7 @@ var (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: yamlfmt [flags] [path ...]\n")
+	fmt.Fprintf(os.Stderr, "usage: vinyl [flags] [path ...]\n")
 	flag.PrintDefaults()
 }
 
@@ -236,7 +236,7 @@ func processFile(filename string, info fs.FileInfo, in io.Reader, r *reporter) e
 		}
 	}
 
-	res, err := yamlfmt.Format(filename, bytes.NewBuffer(src))
+	res, err := vinyl.Format(filename, bytes.NewBuffer(src))
 	if err != nil {
 		return err
 	}
@@ -292,14 +292,14 @@ func main() {
 	maxWeight := (2 << 20) * int64(runtime.GOMAXPROCS(0))
 	s := newSequencer(maxWeight, os.Stdout, os.Stderr)
 
-	// call yamlfmtMain in a separate function
+	// call vinylMain in a separate function
 	// so that it can use defer and have them
 	// run before the exit.
-	yamlfmtMain(s)
+	vinylMain(s)
 	os.Exit(s.GetExitCode())
 }
 
-func yamlfmtMain(s *sequencer) {
+func vinylMain(s *sequencer) {
 	flag.Usage = usage
 	flag.Parse()
 
@@ -379,7 +379,7 @@ func fileWeight(path string, info fs.FileInfo) int64 {
 }
 
 func diffWithReplaceTempFile(b1, b2 []byte, filename string) ([]byte, error) {
-	data, err := Diff("yamlfmt", b1, b2)
+	data, err := Diff("vinyl", b1, b2)
 	if len(data) > 0 {
 		return replaceTempFilename(data, filename)
 	}
@@ -388,8 +388,8 @@ func diffWithReplaceTempFile(b1, b2 []byte, filename string) ([]byte, error) {
 
 // replaceTempFilename replaces temporary filenames in diff with actual one.
 //
-// --- /tmp/yamlfmt316145376	2017-02-03 19:13:00.280468375 -0500
-// +++ /tmp/yamlfmt617882815	2017-02-03 19:13:00.280468375 -0500
+// --- /tmp/vinyl316145376	2017-02-03 19:13:00.280468375 -0500
+// +++ /tmp/vinyl617882815	2017-02-03 19:13:00.280468375 -0500
 // ...
 // ->
 // --- path/to/file.yaml.orig	2017-02-03 19:13:00.280468375 -0500
