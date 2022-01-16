@@ -46,7 +46,9 @@ func usage() {
 func isYamlFile(f fs.DirEntry) bool {
 	// ignore non-Yaml files
 	name := f.Name()
-	return !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".yaml") && !f.IsDir()
+	return !strings.HasPrefix(name, ".") &&
+		(strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml")) &&
+		!f.IsDir()
 }
 
 // A sequencer performs concurrent tasks that may write output, but emits that
